@@ -55,14 +55,31 @@
             backdrop-filter: blur(5px);
         }
 
+        @keyframes playerColor {
+            0% { background-color: #FF0000; }
+            20% { background-color: #FFFF00; }
+            40% { background-color: #00FF00; }
+            60% { background-color: #00FFFF; }
+            80% { background-color: #FF00FF; }
+            100% { background-color: #FF0000; }
+        }
+
         #player {
             position: absolute;
             width: 50px;
             height: 50px;
-            background-color: #4CAF50;
             bottom: 0;
             left: 50px;
             transition: transform 0.3s;
+            animation: playerColor 5s infinite;
+            border-radius: 25px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes obstacleGlow {
+            0% { box-shadow: 0 0 10px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor; }
+            100% { box-shadow: 0 0 10px currentColor; }
         }
 
         .obstacle {
@@ -72,8 +89,17 @@
             bottom: 0;
             right: 0;
             transition: background-color 0.3s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            border-radius: 5px;
+            border-radius: 15px;
+            animation: obstacleGlow 1s infinite;
+            filter: brightness(1.2);
+        }
+
+        @keyframes textColor {
+            0% { color: #FF0000; text-shadow: 0 0 10px #FF0000; }
+            25% { color: #00FF00; text-shadow: 0 0 10px #00FF00; }
+            50% { color: #0000FF; text-shadow: 0 0 10px #0000FF; }
+            75% { color: #FF00FF; text-shadow: 0 0 10px #FF00FF; }
+            100% { color: #FF0000; text-shadow: 0 0 10px #FF0000; }
         }
 
         #game-over {
@@ -83,15 +109,25 @@
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            font-size: 24px;
-            color: #f44336;
+            font-size: 36px;
+            font-weight: bold;
+            animation: textColor 3s infinite;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         #score {
             position: absolute;
             top: 20px;
             right: 20px;
-            font-size: 24px;
+            font-size: 32px;
+            font-weight: bold;
+            animation: textColor 4s infinite;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
         }
 
         @media (max-width: 820px) {
