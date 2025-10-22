@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Jump Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background-color: #fff;
+            border: 2px solid #333;
+            overflow: hidden;
+        }
+
+        #player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            bottom: 0;
+            left: 50px;
+            transition: transform 0.3s;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 30px;
+            height: 60px;
+            background-color: #f44336;
+            bottom: 0;
+            right: 0;
+        }
+
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 24px;
+            color: #f44336;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+
+        @media (max-width: 820px) {
+            #game-container {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="score">Score: 0</div>
+        <div id="game-over">
+            Game Over!<br>
+            Press any key or tap to restart
+        </div>
+    </div>
+    <script>
+        const player = document.getElementById('player');
+        const gameContainer = document.getElementById('game-container');
+        const gameOver = document.getElementById('game-over');
+        const scoreElement = document.getElementById('score');
+        let isJumping = false;
+        let isGameOver = false;
+        let score = 0;
+        let obstacleInterval;
+
+        function jump() {
+            if (!isJumping && !isGameOver) {
+                isJumping = true;
+                player.style.transform = 'translateY(-100px)';
+                setTimeout(() => {
+                    player.style.transform = 'translateY(0)';
+                    isJumping = false;
+                }, 500);
+            }
+        }
+
+        function createObstacle() {
+            if (!isGameOver) {
+                const obstacle = document.createElement('div');
+                obstacle.classList.add('obstacle');
+                gameContainer.appendChild(obstacle);
+
+                let position = gameContainer.offsetWidth;
+                obstacle.style.left = position + 'px';
+
+                const moveObstacle = setInterval(() => {
+                    if (position < -30) {
+                        clearInterval(moveObstacle);
+                        obstacle.remove();
+                        score++;
+                        scoreElement.textContent = `Score: ${score}`;
+                    } else if (position < 100 && position > 20 && !isJumping) {
+                        // Collision detection
+                        endGame();
+                        clearInterval(moveObstacle);
+                    } else {
+                        position -= 5;
+                        obstacle.style.left = position + 'px';
+                    }
+                }, 20);
+            }
+        }
+
+        function endGame() {
+            isGameOver = true;
+            clearInterval(obstacleInterval);
+            gameOver.style.display = 'block';
+        }
+
+        function startGame() {
+            isGameOver = false;
+            score = 0;
+            scoreElement.textContent = 'Score: 0';
+            gameOver.style.display = 'none';
+            
+            // Remove all existing obstacles
+            const obstacles = document.querySelectorAll('.obstacle');
+            obstacles.forEach(obstacle => obstacle.remove());
+            
+            // Start generating new obstacles
+            obstacleInterval = setInterval(createObstacle, 2000);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (event) => {
+            if (isGameOver) {
+                startGame();
+            } else {
+                jump();
+            }
+        });
+
+        // Touch controls for mobile
+        document.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            if (isGameOver) {
+                startGame();
+            } else {
+                jump();
+            }
+        });
+
+        // Start the game initially
+        startGame();
+    </script>
+</body>
+</html>
