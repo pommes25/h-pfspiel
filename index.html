@@ -43,15 +43,33 @@
             animation: gradient 15s ease infinite;
         }
 
+        @keyframes gameBackground {
+            0% {
+                background: linear-gradient(45deg, #ff61d5, #9bfff0);
+            }
+            25% {
+                background: linear-gradient(45deg, #9bfff0, #ffe86d);
+            }
+            50% {
+                background: linear-gradient(45deg, #ffe86d, #ff6161);
+            }
+            75% {
+                background: linear-gradient(45deg, #ff6161, #72ff8f);
+            }
+            100% {
+                background: linear-gradient(45deg, #72ff8f, #ff61d5);
+            }
+        }
+
         #game-container {
             position: relative;
             width: 800px;
             height: 400px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(51, 51, 51, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.5);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            animation: gameBackground 10s infinite;
             backdrop-filter: blur(5px);
         }
 
