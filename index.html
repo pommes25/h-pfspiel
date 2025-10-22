@@ -43,9 +43,9 @@
             position: absolute;
             width: 30px;
             height: 60px;
-            background-color: #f44336;
             bottom: 0;
             right: 0;
+            transition: background-color 0.3s;
         }
 
         #game-over {
@@ -104,9 +104,25 @@
             }
         }
 
+        // Funktion für zufällige Farben
+        function getRandomColor() {
+            const colors = [
+                '#f44336', // Rot
+                '#2196F3', // Blau
+                '#4CAF50', // Grün
+                '#FFC107', // Gelb
+                '#9C27B0', // Lila
+                '#FF9800', // Orange
+                '#00BCD4', // Türkis
+                '#E91E63'  // Pink
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         function createObstacle() {
             const obstacle = document.createElement('div');
             obstacle.classList.add('obstacle');
+            obstacle.style.backgroundColor = getRandomColor();
             gameContainer.appendChild(obstacle);
 
             let position = gameContainer.offsetWidth;
