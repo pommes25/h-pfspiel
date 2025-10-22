@@ -136,14 +136,17 @@
             obstacle.style.left = position + 'px';
 
             const moveObstacle = setInterval(() => {
+                if (isGameOver) {
+                    clearInterval(moveObstacle); // Stoppe die Bewegung bei Game Over
+                    return;
+                }
+
                 if (position < -30) {
                     clearInterval(moveObstacle);
                     obstacle.remove();
-                    if (!isGameOver) {
-                        score++;
-                        scoreElement.textContent = `Score: ${score}`;
-                    }
-                } else if (position < 80 && position > 20 && !isJumping && !isGameOver) {
+                    score++;
+                    scoreElement.textContent = `Score: ${score}`;
+                } else if (position < 80 && position > 20 && !isJumping) {
                     // Kollisionserkennung: nur wenn sich die Hindernisse direkt beim Spieler befinden
                     const playerRect = player.getBoundingClientRect();
                     const obstacleRect = obstacle.getBoundingClientRect();
@@ -163,18 +166,19 @@
         function endGame() {
             isGameOver = true;
             gameOver.style.display = 'block';
-            // Stoppe alle bewegenden Hindernisse
-            document.querySelectorAll('.obstacle').forEach(obstacle => {
-                // Hole die aktuelle Position
-                const currentLeft = obstacle.style.left;
-                // Entferne die Transition
-                obstacle.style.transition = 'none';
-                // Setze die Position fest
-                obstacle.style.left = currentLeft;
-            });
+            
             // Stoppe die Erzeugung neuer Hindernisse
             clearInterval(obstacleInterval);
             obstacleInterval = null;
+
+            // Füge eine CSS-Klasse zu allen Hindernissen hinzu, die sie stoppt
+            document.querySelectorAll('.obstacle').forEach(obstacle => {
+                obstacle.style.animationPlayState = 'paused';
+                // Fixiere die aktuelle Position
+                const currentPosition = obstacle.getBoundingClientRect().left;
+                obstacle.style.left = currentPosition + 'px';
+                obstacle.style.transition = 'none';
+            });
         }
 
         function startGame() {
