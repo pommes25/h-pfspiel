@@ -136,16 +136,29 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        #score {
+        #score, #pause-message {
             position: absolute;
-            top: 20px;
-            right: 20px;
             font-size: 32px;
             font-weight: bold;
             animation: textColor 4s infinite;
             padding: 10px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
+        }
+
+        #score {
+            top: 20px;
+            right: 20px;
+        }
+
+        #pause-message {
+            display: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 36px;
+            z-index: 1000;
         }
 
         @media (max-width: 820px) {
@@ -160,6 +173,7 @@
     <div id="game-container">
         <div id="player"></div>
         <div id="score">Score: 0</div>
+        <div id="pause-message">PAUSE<br>Doppelklick zum Fortsetzen</div>
         <div id="game-over">
             Game Over!<br>
             Press any key or tap to restart
@@ -172,8 +186,10 @@
         const scoreElement = document.getElementById('score');
         let isJumping = false;
         let isGameOver = false;
+        let isPaused = false;
         let score = 0;
         let obstacleInterval;
+        let activeObstacleIntervals = [];
 
         function jump() {
             if (!isJumping && !isGameOver) {
@@ -213,6 +229,8 @@
         }
 
         function createObstacle() {
+            if (isGameOver || isPaused) return;
+
             const obstacle = document.createElement('div');
             obstacle.classList.add('obstacle');
             obstacle.style.backgroundColor = getRandomColor();
@@ -220,33 +238,41 @@
 
             let position = gameContainer.offsetWidth;
             obstacle.style.left = position + 'px';
+            let lastTimestamp = performance.now();
 
             const moveObstacle = setInterval(() => {
                 if (isGameOver) {
-                    clearInterval(moveObstacle); // Stoppe die Bewegung bei Game Over
+                    clearInterval(moveObstacle);
+                    const index = activeObstacleIntervals.indexOf(moveObstacle);
+                    if (index > -1) activeObstacleIntervals.splice(index, 1);
                     return;
                 }
 
-                if (position < -30) {
-                    clearInterval(moveObstacle);
-                    obstacle.remove();
-                    score++;
-                    scoreElement.textContent = `Score: ${score}`;
-                } else if (position < 80 && position > 20 && !isJumping) {
-                    // Kollisionserkennung: nur wenn sich die Hindernisse direkt beim Spieler befinden
-                    const playerRect = player.getBoundingClientRect();
-                    const obstacleRect = obstacle.getBoundingClientRect();
-                    
-                    if (playerRect.right > obstacleRect.left && 
-                        playerRect.left < obstacleRect.right && 
-                        playerRect.bottom > obstacleRect.top) {
-                        endGame();
+                if (!isPaused) {
+                    if (position < -30) {
+                        clearInterval(moveObstacle);
+                        obstacle.remove();
+                        const index = activeObstacleIntervals.indexOf(moveObstacle);
+                        if (index > -1) activeObstacleIntervals.splice(index, 1);
+                        score++;
+                        scoreElement.textContent = `Score: ${score}`;
+                    } else if (position < 80 && position > 20 && !isJumping) {
+                        const playerRect = player.getBoundingClientRect();
+                        const obstacleRect = obstacle.getBoundingClientRect();
+                        
+                        if (playerRect.right > obstacleRect.left && 
+                            playerRect.left < obstacleRect.right && 
+                            playerRect.bottom > obstacleRect.top) {
+                            endGame();
+                        }
+                    } else {
+                        position -= 5;
+                        obstacle.style.left = position + 'px';
                     }
-                } else {
-                    position -= 5;
-                    obstacle.style.left = position + 'px';
                 }
             }, 20);
+
+            activeObstacleIntervals.push(moveObstacle);
         }
 
         function endGame() {
@@ -300,6 +326,35 @@
             } else {
                 jump();
             }
+        });
+
+        // Pause-Funktion
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseMessage = document.getElementById('pause-message');
+            pauseMessage.style.display = isPaused ? 'block' : 'none';
+            
+            if (isPaused) {
+                clearInterval(obstacleInterval);
+                obstacleInterval = null;
+            } else {
+                if (!obstacleInterval && !isGameOver) {
+                    obstacleInterval = setInterval(createObstacle, 2000);
+                }
+            }
+        }
+
+        // Doppelklick-Event-Listener
+        let lastClick = 0;
+        document.addEventListener('click', (event) => {
+            const currentTime = new Date().getTime();
+            const clickTimeDiff = currentTime - lastClick;
+            
+            if (clickTimeDiff < 300) { // Doppelklick erkannt
+                togglePause();
+            }
+            
+            lastClick = currentTime;
         });
 
         // Start the game initially
