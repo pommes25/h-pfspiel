@@ -105,36 +105,36 @@
         }
 
         function createObstacle() {
-            if (!isGameOver) {
-                const obstacle = document.createElement('div');
-                obstacle.classList.add('obstacle');
-                gameContainer.appendChild(obstacle);
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            gameContainer.appendChild(obstacle);
 
-                let position = gameContainer.offsetWidth;
-                obstacle.style.left = position + 'px';
+            let position = gameContainer.offsetWidth;
+            obstacle.style.left = position + 'px';
 
-                const moveObstacle = setInterval(() => {
-                    if (position < -30) {
-                        clearInterval(moveObstacle);
-                        obstacle.remove();
+            const moveObstacle = setInterval(() => {
+                if (position < -30) {
+                    clearInterval(moveObstacle);
+                    obstacle.remove();
+                    if (!isGameOver) {
                         score++;
                         scoreElement.textContent = `Score: ${score}`;
-                    } else if (position < 100 && position > 20 && !isJumping) {
-                        // Collision detection
-                        endGame();
-                        clearInterval(moveObstacle);
-                    } else {
-                        position -= 5;
-                        obstacle.style.left = position + 'px';
                     }
-                }, 20);
+                } else if (position < 100 && position > 20 && !isJumping && !isGameOver) {
+                    // Collision detection
+                    endGame();
+                } else {
+                    position -= 5;
+                    obstacle.style.left = position + 'px';
+                }
+            }, 20);
             }
         }
 
         function endGame() {
             isGameOver = true;
-            clearInterval(obstacleInterval);
             gameOver.style.display = 'block';
+            // Wir stoppen nicht mehr die Hindernisse
         }
 
         function startGame() {
@@ -147,8 +147,10 @@
             const obstacles = document.querySelectorAll('.obstacle');
             obstacles.forEach(obstacle => obstacle.remove());
             
-            // Start generating new obstacles
-            obstacleInterval = setInterval(createObstacle, 2000);
+            // Start generating new obstacles if not already running
+            if (!obstacleInterval) {
+                obstacleInterval = setInterval(createObstacle, 2000);
+            }
         }
 
         // Keyboard controls
