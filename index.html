@@ -98,11 +98,17 @@
         function jump() {
             if (!isJumping && !isGameOver) {
                 isJumping = true;
-                player.style.transform = 'translateY(-100px)';
+                player.style.transform = 'translateY(-150px)';
                 setTimeout(() => {
+                    // Sanfter Übergang zurück zum Boden
+                    player.style.transition = 'transform 0.4s ease-in';
                     player.style.transform = 'translateY(0)';
-                    isJumping = false;
-                }, 500);
+                    // Nach der Landung
+                    setTimeout(() => {
+                        isJumping = false;
+                        player.style.transition = 'transform 0.3s';
+                    }, 400);
+                }, 800);
             }
         }
 
