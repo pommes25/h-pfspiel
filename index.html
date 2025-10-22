@@ -136,9 +136,16 @@
                         score++;
                         scoreElement.textContent = `Score: ${score}`;
                     }
-                } else if (position < 100 && position > 20 && !isJumping && !isGameOver) {
-                    // Collision detection
-                    endGame();
+                } else if (position < 80 && position > 20 && !isJumping && !isGameOver) {
+                    // Kollisionserkennung: nur wenn sich die Hindernisse direkt beim Spieler befinden
+                    const playerRect = player.getBoundingClientRect();
+                    const obstacleRect = obstacle.getBoundingClientRect();
+                    
+                    if (playerRect.right > obstacleRect.left && 
+                        playerRect.left < obstacleRect.right && 
+                        playerRect.bottom > obstacleRect.top) {
+                        endGame();
+                    }
                 } else {
                     position -= 5;
                     obstacle.style.left = position + 'px';
