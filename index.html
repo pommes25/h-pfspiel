@@ -46,6 +46,8 @@
             bottom: 0;
             right: 0;
             transition: background-color 0.3s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            border-radius: 5px;
         }
 
         #game-over {
@@ -104,17 +106,22 @@
             }
         }
 
-        // Funktion für zufällige Farben
+        // Funktion für leuchtende, zufällige Farben
         function getRandomColor() {
+            // Sehr leuchtende, gesättigte Farben
             const colors = [
-                '#f44336', // Rot
-                '#2196F3', // Blau
-                '#4CAF50', // Grün
-                '#FFC107', // Gelb
-                '#9C27B0', // Lila
-                '#FF9800', // Orange
-                '#00BCD4', // Türkis
-                '#E91E63'  // Pink
+                '#FF0000', // Leuchtendes Rot
+                '#00FF00', // Leuchtendes Grün
+                '#0000FF', // Leuchtendes Blau
+                '#FF00FF', // Leuchtendes Magenta
+                '#00FFFF', // Leuchtendes Cyan
+                '#FFFF00', // Leuchtendes Gelb
+                '#FF4500', // Leuchtendes Orange
+                '#8A2BE2', // Leuchtendes Violett
+                '#FF1493', // Leuchtendes Pink
+                '#7FFF00', // Leuchtendes Chartreuse
+                '#FF69B4', // Leuchtendes Hot Pink
+                '#00FF7F'  // Leuchtendes Spring Green
             ];
             return colors[Math.floor(Math.random() * colors.length)];
         }
@@ -156,7 +163,18 @@
         function endGame() {
             isGameOver = true;
             gameOver.style.display = 'block';
-            // Wir stoppen nicht mehr die Hindernisse
+            // Stoppe alle bewegenden Hindernisse
+            document.querySelectorAll('.obstacle').forEach(obstacle => {
+                // Hole die aktuelle Position
+                const currentLeft = obstacle.style.left;
+                // Entferne die Transition
+                obstacle.style.transition = 'none';
+                // Setze die Position fest
+                obstacle.style.left = currentLeft;
+            });
+            // Stoppe die Erzeugung neuer Hindernisse
+            clearInterval(obstacleInterval);
+            obstacleInterval = null;
         }
 
         function startGame() {
